@@ -4,7 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from audit_scraper.models import Report, sanitize_directory_name, sanitize_filename
+from audit_scraper.models import (
+    MAX_FILENAME_BYTES,
+    Report,
+    sanitize_directory_name,
+    sanitize_filename,
+)
 from audit_scraper.parser import parse_reports
 from audit_scraper.scraper import filter_reports
 
@@ -92,3 +97,10 @@ def test_target_path_sanitization(tmp_path: Path) -> None:
 def test_sanitize_helpers() -> None:
     assert sanitize_filename(" report?.pdf ") == "report.pdf"
     assert sanitize_directory_name(" /Year *") == "Year"
+
+
+def test_sanitize_filename_truncation() -> None:
+    title = "Very long title " * 20
+    filename = sanitize_filename(f"0001_{title}.pdf")
+    assert filename.endswith(".pdf")
+    assert len(filename.encode("utf-8")) <= MAX_FILENAME_BYTES

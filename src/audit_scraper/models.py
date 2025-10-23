@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -25,6 +26,8 @@ class Report:
         filename = sanitize_filename(f"{self.serial:04d}_{self.title}.pdf")
         return directory / filename
 
+MAX_FILENAME_BYTES = 200
+
 
 def sanitize_filename(name: str) -> str:
     """Sanitize a filename by replacing unsupported characters with underscores."""
@@ -34,7 +37,24 @@ def sanitize_filename(name: str) -> str:
     sanitized = re.sub(r"_+", "_", sanitized)
     sanitized = re.sub(r"_+(\.)", r"\1", sanitized)
     sanitized = sanitized.strip("._ ")
-    return sanitized or "report.pdf"
+    sanitized = sanitized or "report.pdf"
+
+    encoded = sanitized.encode("utf-8")
+    if len(encoded) <= MAX_FILENAME_BYTES:
+        return sanitized
+
+    stem, ext = os.path.splitext(sanitized)
+    if not ext:
+        ext = ".pdf"
+
+    ext_bytes = ext.encode("utf-8")
+    available = max(1, MAX_FILENAME_BYTES - len(ext_bytes))
+    truncated_stem_bytes = stem.encode("utf-8")[:available]
+    truncated_stem = truncated_stem_bytes.decode("utf-8", "ignore").rstrip("._ ")
+    if not truncated_stem:
+        truncated_stem = "report"
+
+    return f"{truncated_stem}{ext}"
 
 
 def sanitize_directory_name(name: str) -> str:
