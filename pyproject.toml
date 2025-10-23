@@ -1,0 +1,15 @@
+[project]
+name = "audit-scraper"
+version = "0.1.0"
+description = "Scraper for Auditor-General of Pakistan audit reports"
+readme = "README.md"
+authors = [{ name = "Audit Scraper" }]
+requires-python = ">=3.9"
+dependencies = [
+    "beautifulsoup4>=4.12,<5",
+    "requests>=2.32,<3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "-ra"
