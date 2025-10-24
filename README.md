@@ -51,3 +51,5 @@ pytest
 ```
 
 The tests use mocked HTML snippets so no network access is required.
+
+Created by GPT5-Codex
